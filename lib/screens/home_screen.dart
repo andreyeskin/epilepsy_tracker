@@ -4,6 +4,7 @@ import 'seizure_log_screen.dart';
 import 'medication_screen.dart';
 import 'relaxation_screen.dart';
 import 'insights_screen.dart';
+import 'fhir_demo_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -132,6 +133,37 @@ class HomeScreen extends StatelessWidget {
                       },
                     ),
                   ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // FHIR Integration (Entwicklung)
+                const Text(
+                  'Entwicklung & Testing',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1F2A24),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                SizedBox(
+                  height: 140,
+                  child: QuickActionCard(
+                    icon: Icons.cloud_sync,
+                    title: 'FHIR Demo',
+                    description: 'FHIR Integration testen',
+                    color: const Color(0xFF6A5ACD),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const FhirDemoScreen(),
+                        ),
+                      );
+                    },
+                  ),
                 ),
 
                 const SizedBox(height: 24),
