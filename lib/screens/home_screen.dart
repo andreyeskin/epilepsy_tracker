@@ -1,13 +1,222 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../widgets/quick_action_card.dart';
 import 'seizure_log_screen.dart';
 import 'medication_screen.dart';
 import 'relaxation_screen.dart';
 import 'insights_screen.dart';
 import 'fhir_demo_screen.dart';
+import '../services/fitbit_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // Fitbit Service
+  final FitbitService _fitbitService = FitbitService();
+
+  // State Variables
+  bool _isAuthenticated = false;
+  bool _isLoading = false;
+  int? _steps;
+  int? _restingHeartRate;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthenticationStatus();
+  }
+
+  // Check if user is authenticated with Fitbit
+  Future<void> _checkAuthenticationStatus() async {
+    final isAuth = await _fitbitService.isAuthenticated();
+    setState(() {
+      _isAuthenticated = isAuth;
+    });
+  }
+
+  // Connect to Fitbit
+  Future<void> _connectToFitbit() async {
+    try {
+      // Get authorization URL
+      final authUrl = _fitbitService.getAuthorizationUrl();
+
+      // Open browser
+      final uri = Uri.parse(authUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+        // Show dialog for code input
+        if (!mounted) return;
+        final code = await _showCodeInputDialog();
+
+        if (code != null && code.isNotEmpty) {
+          setState(() {
+            _isLoading = true;
+            _errorMessage = null;
+          });
+
+          // Exchange code for tokens
+          final success = await _fitbitService.exchangeAuthorizationCode(code);
+
+          setState(() {
+            _isLoading = false;
+          });
+
+          if (success) {
+            setState(() {
+              _isAuthenticated = true;
+            });
+            // Load data immediately after authentication
+            await _loadFitbitData();
+          } else {
+            setState(() {
+              _errorMessage = 'Fehler beim Verbinden mit Fitbit. Bitte versuchen Sie es erneut.';
+            });
+          }
+        }
+      } else {
+        setState(() {
+          _errorMessage = 'Konnte Browser nicht öffnen.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Fehler: $e';
+      });
+    }
+  }
+
+  // Show dialog for authorization code input
+  Future<String?> _showCodeInputDialog() async {
+    final controller = TextEditingController();
+
+    return showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Fitbit Autorisierungscode'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Bitte geben Sie den Autorisierungscode aus der Fitbit-Webseite ein:',
+                style: TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  labelText: 'Code',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(null),
+              child: const Text('Abbrechen'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(controller.text),
+              child: const Text('Bestätigen'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Load Fitbit data
+  Future<void> _loadFitbitData() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final steps = await _fitbitService.getStepsToday();
+      final heartRate = await _fitbitService.getRestingHeartRate();
+
+      setState(() {
+        _steps = steps;
+        _restingHeartRate = heartRate;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Fehler beim Laden der Daten: $e';
+      });
+    }
+  }
+
+  // Disconnect from Fitbit
+  Future<void> _disconnectFitbit() async {
+    await _fitbitService.deleteTokens();
+    setState(() {
+      _isAuthenticated = false;
+      _steps = null;
+      _restingHeartRate = null;
+      _errorMessage = null;
+    });
+  }
+
+  // Build data card
+  Widget _buildDataCard(String title, String? value, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF7FAF9),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE8F2EE)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: const Color(0xFF4CAF93),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: Colors.white, size: 24),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value ?? 'Keine Daten',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1F2A24),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,6 +372,157 @@ class HomeScreen extends StatelessWidget {
                         ),
                       );
                     },
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Fitbit Aktivitätsdaten
+                const Text(
+                  'Fitbit Aktivitätsdaten',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1F2A24),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7FAF9),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (!_isAuthenticated) ...[
+                        // Not authenticated
+                        const Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Color(0xFF4CAF93)),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Verbinden Sie Ihr Fitbit-Konto, um Ihre Aktivitätsdaten zu sehen.',
+                                style: TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: _isLoading ? null : _connectToFitbit,
+                            icon: const Icon(Icons.link),
+                            label: const Text('Mit Fitbit verbinden'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF4CAF93),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ] else ...[
+                        // Authenticated
+                        if (_isLoading) ...[
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                        ] else ...[
+                          // Data cards
+                          _buildDataCard(
+                            'Schritte heute',
+                            _steps != null ? '$_steps Schritte' : null,
+                            Icons.directions_walk,
+                          ),
+                          const SizedBox(height: 12),
+                          _buildDataCard(
+                            'Ruhe-Herzfrequenz',
+                            _restingHeartRate != null ? '$_restingHeartRate bpm' : null,
+                            Icons.favorite,
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: _loadFitbitData,
+                                  icon: const Icon(Icons.refresh),
+                                  label: const Text('Aktualisieren'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF4CAF93),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: _disconnectFitbit,
+                                  icon: const Icon(Icons.link_off),
+                                  label: const Text('Trennen'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.red,
+                                    side: const BorderSide(color: Colors.red),
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                      // Error message
+                      if (_errorMessage != null) ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.red.shade200),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _errorMessage!,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.red.shade700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
 
