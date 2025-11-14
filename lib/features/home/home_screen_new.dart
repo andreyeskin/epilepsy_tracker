@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_strings.dart';
@@ -52,46 +51,27 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
   // Connect to Fitbit
   Future<void> _connectToFitbit() async {
     try {
-      // Get authorization URL
-      final authUrl = _fitbitService.getAuthorizationUrl();
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
 
-      // Open browser
-      final uri = Uri.parse(authUrl);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      // Authorize using fitbitter
+      final success = await _fitbitService.authorize();
 
-        // Show dialog for code input
-        if (!mounted) return;
-        final code = await _showCodeInputDialog();
+      setState(() {
+        _isLoading = false;
+      });
 
-        if (code != null && code.isNotEmpty) {
-          setState(() {
-            _isLoading = true;
-            _errorMessage = null;
-          });
-
-          // Exchange code for tokens
-          final success = await _fitbitService.exchangeAuthorizationCode(code);
-
-          setState(() {
-            _isLoading = false;
-          });
-
-          if (success) {
-            setState(() {
-              _isAuthenticated = true;
-            });
-            // Load data immediately after authentication
-            await _loadFitbitData();
-          } else {
-            setState(() {
-              _errorMessage = 'Fehler beim Verbinden mit Fitbit. Bitte versuchen Sie es erneut.';
-            });
-          }
-        }
+      if (success) {
+        setState(() {
+          _isAuthenticated = true;
+        });
+        // Load data immediately after authentication
+        await _loadFitbitData();
       } else {
         setState(() {
-          _errorMessage = 'Konnte Browser nicht öffnen.';
+          _errorMessage = 'Fehler beim Verbinden mit Fitbit. Bitte versuchen Sie es erneut.';
         });
       }
     } catch (e) {
@@ -100,47 +80,6 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
         _errorMessage = 'Fehler: $e';
       });
     }
-  }
-
-  // Show dialog for authorization code input
-  Future<String?> _showCodeInputDialog() async {
-    final controller = TextEditingController();
-
-    return showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Fitbit Autorisierungscode'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Bitte geben Sie den Autorisierungscode aus der Fitbit-Webseite ein:',
-                style: TextStyle(fontSize: 14),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: controller,
-                decoration: const InputDecoration(
-                  labelText: 'Code',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(null),
-              child: const Text('Abbrechen'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(controller.text),
-              child: const Text('Bestätigen'),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   // Load Fitbit data

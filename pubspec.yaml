@@ -37,13 +37,14 @@ dependencies:
   # HTTP & APIs
   http: ^1.2.0
 
+
   # Charts für Insights
   fl_chart: ^0.66.0
 
   # Lokale Datenbank
   sqflite: ^2.3.0
   path_provider: ^2.1.1
-
+  path: ^1.8.3
   # Datum/Zeit
   intl: ^0.20.2
 
@@ -54,6 +55,7 @@ dependencies:
   fitbitter: ^2.0.6
   flutter_secure_storage: ^9.2.2
   url_launcher: ^6.3.1
+  flutter_web_auth_2: ^4.1.0
 
   # Bilder & Fotos
   image_picker: ^1.0.5

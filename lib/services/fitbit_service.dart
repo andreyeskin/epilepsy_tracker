@@ -1,14 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 
 class FitbitService {
   // Fitbit OAuth Credentials
   static const String clientId = '23TQK4';
   static const String clientSecret = 'f7cd25a75d12571fc486a915458feae9';
-  static const String redirectUri = 'http://localhost:8080/callback';
+  static const String redirectUri = 'epilepsytracker://fitbit/callback';
+  static const String callbackScheme = 'epilepsytracker';
 
-  // Fitbit API Endpoints
+  // Fitbit API URLs
   static const String authorizationUrl = 'https://www.fitbit.com/oauth2/authorize';
   static const String tokenUrl = 'https://api.fitbit.com/oauth2/token';
   static const String apiBaseUrl = 'https://api.fitbit.com/1/user/-';
@@ -17,30 +19,38 @@ class FitbitService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   // Storage Keys
+  static const String _userIdKey = 'fitbit_user_id';
   static const String _accessTokenKey = 'fitbit_access_token';
   static const String _refreshTokenKey = 'fitbit_refresh_token';
 
-  // OAuth: Generate Authorization URL
-  String getAuthorizationUrl() {
-    final params = {
-      'response_type': 'code',
-      'client_id': clientId,
-      'redirect_uri': redirectUri,
-      'scope': 'activity heartrate sleep',
-      'expires_in': '604800', // 7 days
-    };
-
-    final queryString = params.entries
-        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-        .join('&');
-
-    return '$authorizationUrl?$queryString';
-  }
-
-  // OAuth: Exchange Authorization Code for Tokens
-  Future<bool> exchangeAuthorizationCode(String code) async {
+  // Authorize and get tokens
+  Future<bool> authorize() async {
     try {
-      final response = await http.post(
+      // Build authorization URL
+      final authUrl = Uri.https('www.fitbit.com', '/oauth2/authorize', {
+        'response_type': 'code',
+        'client_id': clientId,
+        'redirect_uri': redirectUri,
+        'scope': 'activity heartrate sleep',
+        'expires_in': '604800',
+      });
+
+      // Open browser and wait for callback
+      final result = await FlutterWebAuth2.authenticate(
+        url: authUrl.toString(),
+        callbackUrlScheme: callbackScheme,
+      );
+
+      // Extract authorization code from callback
+      final code = Uri.parse(result).queryParameters['code'];
+
+      if (code == null || code.isEmpty) {
+        print('No authorization code received');
+        return false;
+      }
+
+      // Exchange code for tokens
+      final tokenResponse = await http.post(
         Uri.parse(tokenUrl),
         headers: {
           'Authorization': 'Basic ${base64Encode(utf8.encode('$clientId:$clientSecret'))}',
@@ -53,22 +63,42 @@ class FitbitService {
         },
       );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+      if (tokenResponse.statusCode == 200) {
+        final data = json.decode(tokenResponse.body);
+
+        // Save credentials
+        await _storage.write(key: _userIdKey, value: data['user_id']);
         await _storage.write(key: _accessTokenKey, value: data['access_token']);
         await _storage.write(key: _refreshTokenKey, value: data['refresh_token']);
+
+        print('Authorization successful! User ID: ${data['user_id']}');
         return true;
       } else {
-        print('Token exchange failed: ${response.statusCode} - ${response.body}');
+        print('Token exchange failed: ${tokenResponse.statusCode} - ${tokenResponse.body}');
         return false;
       }
     } catch (e) {
-      print('Error exchanging authorization code: $e');
+      print('Error during authorization: $e');
       return false;
     }
   }
 
-  // Token Management: Get Access Token
+  // Check if authenticated
+  Future<bool> isAuthenticated() async {
+    try {
+      final userId = await _storage.read(key: _userIdKey);
+      final accessToken = await _storage.read(key: _accessTokenKey);
+      return userId != null &&
+             userId.isNotEmpty &&
+             accessToken != null &&
+             accessToken.isNotEmpty;
+    } catch (e) {
+      print('Error checking authentication: $e');
+      return false;
+    }
+  }
+
+  // Get access token
   Future<String?> getAccessToken() async {
     try {
       return await _storage.read(key: _accessTokenKey);
@@ -78,23 +108,7 @@ class FitbitService {
     }
   }
 
-  // Token Management: Check if authenticated
-  Future<bool> isAuthenticated() async {
-    final token = await getAccessToken();
-    return token != null && token.isNotEmpty;
-  }
-
-  // Token Management: Delete tokens (disconnect)
-  Future<void> deleteTokens() async {
-    try {
-      await _storage.delete(key: _accessTokenKey);
-      await _storage.delete(key: _refreshTokenKey);
-    } catch (e) {
-      print('Error deleting tokens: $e');
-    }
-  }
-
-  // API Call: Get Steps for Today
+  // Get Steps for Today
   Future<int?> getStepsToday() async {
     try {
       final token = await getAccessToken();
@@ -129,11 +143,11 @@ class FitbitService {
       }
     } catch (e) {
       print('Error getting steps: $e');
-      rethrow;
+      return null;
     }
   }
 
-  // API Call: Get Resting Heart Rate
+  // Get Resting Heart Rate
   Future<int?> getRestingHeartRate() async {
     try {
       final token = await getAccessToken();
@@ -172,11 +186,11 @@ class FitbitService {
       }
     } catch (e) {
       print('Error getting heart rate: $e');
-      rethrow;
+      return null;
     }
   }
 
-  // Token Refresh
+  // Refresh access token
   Future<bool> _refreshAccessToken() async {
     try {
       final refreshToken = await _storage.read(key: _refreshTokenKey);
@@ -208,6 +222,17 @@ class FitbitService {
     } catch (e) {
       print('Error refreshing token: $e');
       return false;
+    }
+  }
+
+  // Delete tokens (disconnect)
+  Future<void> deleteTokens() async {
+    try {
+      await _storage.delete(key: _userIdKey);
+      await _storage.delete(key: _accessTokenKey);
+      await _storage.delete(key: _refreshTokenKey);
+    } catch (e) {
+      print('Error deleting tokens: $e');
     }
   }
 }
