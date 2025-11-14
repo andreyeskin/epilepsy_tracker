@@ -30,12 +30,39 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  fl_chart: ^0.65.0
+
+  # State Management
+  provider: ^6.1.1
+
+  # HTTP & APIs
   http: ^1.2.0
+
+  # Charts für Insights
+  fl_chart: ^0.66.0
+
+  # Lokale Datenbank
+  sqflite: ^2.3.0
+  path_provider: ^2.1.1
+
+  # Datum/Zeit
+  intl: ^0.20.2
+
+  # Einstellungen
+  shared_preferences: ^2.2.2
+
+  # Fitbit Integration
   fitbitter: ^2.0.6
   flutter_secure_storage: ^9.2.2
   url_launcher: ^6.3.1
 
+  # Bilder & Fotos
+  image_picker: ^1.0.5
+
+  # Berechtigungen
+  permission_handler: ^11.1.0
+
+  # UI Helpers
+  shimmer: ^3.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

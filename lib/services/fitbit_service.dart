@@ -4,9 +4,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class FitbitService {
   // Fitbit OAuth Credentials
-  static const String clientId = 'YOUR_CLIENT_ID';
-  static const String clientSecret = 'YOUR_CLIENT_SECRET';
-  static const String redirectUri = 'YOUR_REDIRECT_URI';
+  static const String clientId = '23TQK4';
+  static const String clientSecret = 'f7cd25a75d12571fc486a915458feae9';
+  static const String redirectUri = 'http://localhost:8080/callback';
 
   // Fitbit API Endpoints
   static const String authorizationUrl = 'https://www.fitbit.com/oauth2/authorize';

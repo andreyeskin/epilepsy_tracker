@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'app/theme.dart';
+import 'core/constants/app_strings.dart';
+import 'features/home/home_screen_new.dart';
 import 'screens/seizure_log_screen.dart';
-import 'screens/medication_screen.dart';
-import 'screens/relaxation_screen.dart';
 import 'screens/insights_screen.dart';
+import 'features/medications/medications_screen_new.dart';
+import 'features/relaxation/relaxation_screen_new.dart';
+import 'shared/widgets/app_bottom_nav_bar.dart';
+import 'shared/widgets/floating_emergency_button.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,16 +19,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Epilepsie Tracker',
+      title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4CAF93),
-          primary: const Color(0xFF4CAF93),
-        ),
-        useMaterial3: true,
-        fontFamily: 'Inter',
-      ),
+      theme: AppTheme.lightTheme,
       home: const MainNavigationScreen(),
     );
   }
@@ -41,9 +38,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const HomeScreen(),
-    const RelaxationScreen(),
-    const MedicationScreen(),
+    const HomeScreenNew(),
+    const RelaxationScreenNew(),
+    const MedicationsScreenNew(),
     const InsightsScreen(),
   ];
 
@@ -51,50 +48,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF4CAF93),
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        elevation: 8,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Start',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outline),
-            activeIcon: Icon(Icons.favorite),
-            label: 'Wohlbefinden',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.medication_outlined),
-            activeIcon: Icon(Icons.medication),
-            label: 'Medikamente',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart_outlined),
-            activeIcon: Icon(Icons.bar_chart),
-            label: 'Einblicke',
-          ),
-        ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingEmergencyButton(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const SeizureLogScreen()),
           );
         },
-        backgroundColor: const Color(0xFFD9534F),
-        child: const Icon(Icons.warning, color: Colors.white),
       ),
     );
   }
