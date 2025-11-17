@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../widgets/quick_action_card.dart';
 import 'seizure_log_screen.dart';
 import 'medication_screen.dart';
-import 'relaxation_screen.dart';
 import 'insights_screen.dart';
 import 'fhir_demo_screen.dart';
 import '../services/fitbit_service.dart';
+import '../features/wellbeing/wellbeing_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -254,14 +254,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     QuickActionCard(
                       icon: Icons.self_improvement,
-                      title: 'Ruheraum',
-                      description: 'Entspannung & Atmung',
+                      title: 'Wohlbefinden',
+                      description: 'Tagesform dokumentieren',
                       color: const Color(0xFF3A8C78),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const RelaxationScreen(),
+                            builder: (context) => const WellbeingScreen(),
                           ),
                         );
                       },
