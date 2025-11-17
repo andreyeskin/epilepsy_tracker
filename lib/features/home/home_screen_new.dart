@@ -7,7 +7,7 @@ import '../../screens/seizure_log_screen.dart';
 import '../../screens/fhir_demo_screen.dart';
 import '../../screens/insights_screen.dart';
 import '../../features/medications/medications_screen_new.dart';
-import '../../screens/relaxation_screen.dart';
+import '../../features/wellbeing/wellbeing_screen.dart';
 import '../../services/fitbit_service.dart';
 import 'widgets/greeting_header.dart';
 import 'widgets/quick_actions_grid.dart';
@@ -159,7 +159,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const RelaxationScreen(),
+                        builder: (context) => const WellbeingScreen(),
                       ),
                     );
                   },
