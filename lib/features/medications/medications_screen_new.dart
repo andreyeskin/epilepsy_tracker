@@ -172,12 +172,29 @@ class _MedicationsScreenNewState extends State<MedicationsScreenNew> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section Title
+        // Section Title with Icon
         Padding(
           padding: const EdgeInsets.only(bottom: AppDimensions.spacingMd),
-          child: Text(
-            title,
-            style: AppTextStyles.h3,
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppDimensions.spacingSm),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                ),
+                child: Icon(
+                  isToday ? Icons.today : Icons.event,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppDimensions.spacingMd),
+              Text(
+                title,
+                style: AppTextStyles.h3,
+              ),
+            ],
           ),
         ),
 
@@ -187,6 +204,13 @@ class _MedicationsScreenNewState extends State<MedicationsScreenNew> {
             color: AppColors.background,
             borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
             border: Border.all(color: AppColors.divider),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: medications.isEmpty
               ? _buildEmptyState()
@@ -197,6 +221,8 @@ class _MedicationsScreenNewState extends State<MedicationsScreenNew> {
                   separatorBuilder: (context, index) => const Divider(
                     height: 1,
                     color: AppColors.divider,
+                    indent: AppDimensions.spacingLg,
+                    endIndent: AppDimensions.spacingLg,
                   ),
                   itemBuilder: (context, index) {
                     return _buildMedicationItem(
@@ -217,20 +243,42 @@ class _MedicationsScreenNewState extends State<MedicationsScreenNew> {
       padding: const EdgeInsets.all(AppDimensions.spacingLg),
       child: Row(
         children: [
-          // Medication Icon
+          // Medication Icon with gradient
           Container(
-            width: 48,
-            height: 48,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
-              color: isTaken
-                  ? AppColors.success.withOpacity(0.2)
-                  : AppColors.primary.withOpacity(0.2),
+              gradient: isTaken
+                  ? LinearGradient(
+                      colors: [
+                        AppColors.success,
+                        AppColors.success.withOpacity(0.7),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : LinearGradient(
+                      colors: [
+                        AppColors.primary,
+                        AppColors.primaryLight,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
               borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+              boxShadow: [
+                BoxShadow(
+                  color: (isTaken ? AppColors.success : AppColors.primary)
+                      .withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Icon(
               Icons.medication,
-              color: isTaken ? AppColors.success : AppColors.primary,
-              size: 24,
+              color: Colors.white,
+              size: 28,
             ),
           ),
           const SizedBox(width: AppDimensions.spacingMd),
@@ -240,86 +288,151 @@ class _MedicationsScreenNewState extends State<MedicationsScreenNew> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${medication.name} ${medication.dosage}',
-                  style: AppTextStyles.cardTitle,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${medication.name} ${medication.dosage}',
+                        style: AppTextStyles.cardTitle.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    if (isTaken)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimensions.spacingSm,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.success.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                          border: Border.all(
+                            color: AppColors.success.withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              color: AppColors.success,
+                              size: 12,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Genommen',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.success,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: AppDimensions.spacingXs),
-                Text(
-                  '${medication.quantity} ${AppStrings.medsTablets} • ${medication.timeOfDay} • ${medication.formattedTime}',
-                  style: AppTextStyles.cardSubtitle,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.pills,
+                      size: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${medication.quantity} ${AppStrings.medsTablets}',
+                      style: AppTextStyles.cardSubtitle,
+                    ),
+                    const SizedBox(width: AppDimensions.spacingMd),
+                    Icon(
+                      medication.timeOfDay == AppStrings.medsMorning
+                          ? Icons.wb_sunny
+                          : Icons.nightlight,
+                      size: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      medication.timeOfDay,
+                      style: AppTextStyles.cardSubtitle,
+                    ),
+                    const SizedBox(width: AppDimensions.spacingMd),
+                    Icon(
+                      Icons.schedule,
+                      size: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      medication.formattedTime,
+                      style: AppTextStyles.cardSubtitle.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
 
           // Action Button
-          if (isToday)
-            _buildStatusButton(medication)
-          else
-            Text(
-              medication.formattedTime,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+          if (isToday && !isTaken) ...[
+            const SizedBox(width: AppDimensions.spacingMd),
+            _buildStatusButton(medication),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildStatusButton(Medication medication) {
-    final isTaken = medication.status == MedicationStatus.taken;
-
-    if (isTaken) {
-      return Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacingMd,
-          vertical: AppDimensions.spacingSm,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryMedium],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.success,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: () => _markAsTaken(medication.id),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: AppColors.textOnPrimary,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spacingLg,
+            vertical: AppDimensions.spacingMd,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.check_circle,
-              color: AppColors.textOnPrimary,
-              size: 16,
-            ),
+            const Icon(Icons.check_circle_outline, size: 18),
             const SizedBox(width: AppDimensions.spacingXs),
             Text(
-              AppStrings.medsTaken,
+              AppStrings.medsTake,
               style: AppTextStyles.buttonSmall.copyWith(
-                fontSize: 12,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
-        ),
-      );
-    }
-
-    return ElevatedButton(
-      onPressed: () => _markAsTaken(medication.id),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spacingMd,
-          vertical: AppDimensions.spacingSm,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
-        ),
-        elevation: 0,
-      ),
-      child: Text(
-        AppStrings.medsTake,
-        style: AppTextStyles.buttonSmall.copyWith(
-          fontSize: 12,
         ),
       ),
     );
@@ -350,29 +463,50 @@ class _MedicationsScreenNewState extends State<MedicationsScreenNew> {
   }
 
   Widget _buildAddButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: AppDimensions.buttonHeightLg,
-      child: OutlinedButton.icon(
-        onPressed: () {
-          // TODO: Navigate to Add Medication Screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Add Medication Screen wird noch implementiert'),
-            ),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: Text(
-          AppStrings.medsAddNew,
-          style: AppTextStyles.button.copyWith(
-            color: AppColors.primary,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-        ),
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: AppColors.primary, width: 2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+        ],
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: AppDimensions.buttonHeightLg,
+        child: OutlinedButton.icon(
+          onPressed: () {
+            // TODO: Navigate to Add Medication Screen
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Add Medication Screen wird noch implementiert'),
+              ),
+            );
+          },
+          icon: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+            ),
+            child: const Icon(Icons.add, size: 20),
+          ),
+          label: Text(
+            AppStrings.medsAddNew,
+            style: AppTextStyles.button.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: AppColors.primary.withOpacity(0.3), width: 1.5),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+            ),
+            backgroundColor: AppColors.primary.withOpacity(0.03),
           ),
         ),
       ),
