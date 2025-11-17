@@ -1,0 +1,70 @@
+EPILEPSY TRACKER - ESTRUCTURA DEL PROYECTO FLUTTER
+================================================
+
+DIRECTORIO RAÍZ:
+/home/user/epilepsy_tracker/
+├── pubspec.yaml          # Configuración de dependencias
+├── analysis_options.yaml # Configuración de análisis estático
+├── README.md
+├── lib/                  # CÓDIGO FUENTE
+│   ├── main.dart        # Punto de entrada (Navegación principal)
+│   ├── app/
+│   │   └── theme.dart   # Tema Material Design 3
+│   ├── core/
+│   │   ├── constants/
+│   │   │   ├── app_colors.dart
+│   │   │   ├── app_dimensions.dart
+│   │   │   ├── app_strings.dart (textos en alemán)
+│   │   │   └── app_text_styles.dart
+│   │   └── models/
+│   │       └── medication.dart
+│   ├── models/
+│   │   ├── seizure.dart
+│   │   └── fitbit_data.dart
+│   ├── services/
+│   │   ├── seizure_database_service.dart
+│   │   ├── fitbit_service.dart
+│   │   └── fhir_service.dart
+│   ├── features/      # Feature-driven structure
+│   │   ├── home/
+│   │   │   ├── home_screen_new.dart
+│   │   │   └── widgets/
+│   │   │       ├── greeting_header.dart
+│   │   │       ├── medication_preview.dart
+│   │   │       ├── quick_actions_grid.dart
+│   │   │       └── seizure_preview.dart
+│   │   ├── medications/
+│   │   │   ├── medications_screen_new.dart
+│   │   │   └── widgets/
+│   │   ├── insights/
+│   │   │   ├── insights_screen_new.dart
+│   │   │   └── widgets/
+│   │   │       ├── achievement_badge.dart
+│   │   │       ├── adherence_line_chart.dart
+│   │   │       ├── month_selector.dart
+│   │   │       ├── seizure_frequency_chart.dart
+│   │   │       ├── stats_summary_row.dart
+│   │   │       └── trigger_donut_chart.dart
+│   │   ├── relaxation/
+│   │   │   └── relaxation_screen_new.dart
+│   │   └── wellbeing/
+│   │       └── wellbeing_screen.dart
+│   ├── screens/        # Legacy screens (algunas aún activas)
+│   │   ├── home_screen.dart
+│   │   ├── insights_screen.dart
+│   │   ├── medication_screen.dart
+│   │   ├── relaxation_screen.dart
+│   │   ├── seizure_log_screen.dart
+│   │   └── fhir_demo_screen.dart
+│   ├── shared/
+│   │   └── widgets/
+│   │       ├── app_bottom_nav_bar.dart
+│   │       └── floating_emergency_button.dart
+│   └── widgets/
+│       └── quick_action_card.dart
+├── ios/                # Configuración iOS
+├── android/            # Configuración Android
+├── macos/              # Configuración macOS
+├── linux/              # Configuración Linux
+├── windows/            # Configuración Windows
+└── web/                # Configuración Web
