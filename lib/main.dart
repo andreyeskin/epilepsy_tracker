@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'app/theme.dart';
 import 'core/constants/app_strings.dart';
 import 'features/home/home_screen_new.dart';
@@ -8,6 +9,7 @@ import 'features/medications/medications_screen_new.dart';
 import 'features/relaxation/relaxation_screen_new.dart';
 import 'shared/widgets/app_bottom_nav_bar.dart';
 import 'shared/widgets/floating_emergency_button.dart';
+import 'features/indoor_lbs/indoor_lbs_module.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,11 +20,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: AppStrings.appName,
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: const MainNavigationScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => IndoorLbsModule.createProvider(
+            initializeMockData: true,
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        title: AppStrings.appName,
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        home: const MainNavigationScreen(),
+      ),
     );
   }
 }

@@ -28,8 +28,9 @@ class SeizureDatabaseService {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -47,6 +48,8 @@ class SeizureDatabaseService {
         symptomsAfter TEXT,
         triggers TEXT,
         location TEXT,
+        roomId TEXT,
+        roomName TEXT,
         activity TEXT,
         medicationTaken INTEGER NOT NULL,
         medicationName TEXT,
@@ -55,6 +58,15 @@ class SeizureDatabaseService {
         updatedAt TEXT
       )
     ''');
+  }
+
+  /// Aktualisiert die Datenbank bei Versionswechsel
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Migration von Version 1 zu 2: Neue Spalten für Indoor-LBS hinzufügen
+      await db.execute('ALTER TABLE seizures ADD COLUMN roomId TEXT');
+      await db.execute('ALTER TABLE seizures ADD COLUMN roomName TEXT');
+    }
   }
 
   /// Fügt einen neuen Anfall hinzu

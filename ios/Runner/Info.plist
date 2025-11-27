@@ -56,5 +56,12 @@
 			</array>
 		</dict>
 	</array>
+	<!-- Bluetooth permissions for Indoor-LBS -->
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Diese App verwendet Bluetooth, um Ihre Position im Innenbereich zu bestimmen und Ihre Sicherheit in verschiedenen Räumen zu überwachen.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Diese App verwendet Bluetooth, um nahegelegene Beacons zu erkennen und Ihren aktuellen Raum zu bestimmen.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Diese App benötigt Standortzugriff, um Bluetooth-Beacons für die Indoor-Positionierung zu scannen.</string>
 </dict>
 </plist>

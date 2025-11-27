@@ -13,6 +13,7 @@ import 'widgets/greeting_header.dart';
 import 'widgets/quick_actions_grid.dart';
 import 'widgets/medication_preview.dart';
 import 'widgets/seizure_preview.dart';
+import '../../features/indoor_lbs/indoor_lbs_module.dart';
 
 /// Home Screen - Hauptbildschirm der App
 /// Refactored version mit modularen Widgets
@@ -174,59 +175,137 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                 ),
                 const SizedBox(height: AppDimensions.spacingXxl),
 
+                // Aktueller Standort (Indoor-LBS)
+                Text(
+                  'Standort & Sicherheit',
+                  style: AppTextStyles.h4,
+                ),
+                const SizedBox(height: AppDimensions.spacingMd),
+                RoomIndicatorWidget(
+                  showDetails: true,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SafeZoneScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: AppDimensions.spacingXxl),
+
                 // FHIR Integration (Entwicklung)
                 Text(
                   'Entwicklung & Testing',
                   style: AppTextStyles.h4,
                 ),
                 const SizedBox(height: AppDimensions.spacingMd),
-                SizedBox(
-                  height: 140,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const FhirDemoScreen(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(AppDimensions.spacingLg),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF6A5ACD), Color(0xFF8A7BD9)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.cloud_sync,
-                            size: 48,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(height: AppDimensions.spacingSm),
-                          Text(
-                            'FHIR Demo',
-                            style: AppTextStyles.h4.copyWith(
-                              color: Colors.white,
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const FhirDemoScreen(),
                             ),
-                          ),
-                          const SizedBox(height: AppDimensions.spacingXs),
-                          Text(
-                            'FHIR Integration testen',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: Colors.white.withOpacity(0.9),
+                          );
+                        },
+                        child: Container(
+                          height: 140,
+                          padding: const EdgeInsets.all(AppDimensions.spacingLg),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF6A5ACD), Color(0xFF8A7BD9)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                           ),
-                        ],
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.cloud_sync,
+                                size: 40,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(height: AppDimensions.spacingSm),
+                              Text(
+                                'FHIR Demo',
+                                style: AppTextStyles.h4.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: AppDimensions.spacingXs),
+                              Text(
+                                'FHIR Integration',
+                                textAlign: TextAlign.center,
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: AppDimensions.spacingMd),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SafeZoneScreen(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          height: 140,
+                          padding: const EdgeInsets.all(AppDimensions.spacingLg),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                size: 40,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(height: AppDimensions.spacingSm),
+                              Text(
+                                'Safe Zone',
+                                style: AppTextStyles.h4.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: AppDimensions.spacingXs),
+                              Text(
+                                'Indoor-LBS',
+                                textAlign: TextAlign.center,
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: AppDimensions.spacingXxl),
 

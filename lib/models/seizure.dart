@@ -13,6 +13,8 @@ class Seizure {
   final List<String> symptomsAfter; // Symptome nach dem Anfall
   final List<String> triggers; // Mögliche Auslöser
   final String? location; // Wo der Anfall passierte
+  final String? roomId; // ID des Raums (automatisch erkannt via Indoor-LBS)
+  final String? roomName; // Name des Raums (automatisch erkannt via Indoor-LBS)
   final String? activity; // Was die Person gerade gemacht hat
   final bool medicationTaken; // Wurde Notfallmedikation genommen?
   final String? medicationName; // Name der Notfallmedikation
@@ -31,6 +33,8 @@ class Seizure {
     this.symptomsAfter = const [],
     this.triggers = const [],
     this.location,
+    this.roomId,
+    this.roomName,
     this.activity,
     this.medicationTaken = false,
     this.medicationName,
@@ -51,6 +55,8 @@ class Seizure {
     List<String>? symptomsAfter,
     List<String>? triggers,
     String? location,
+    String? roomId,
+    String? roomName,
     String? activity,
     bool? medicationTaken,
     String? medicationName,
@@ -69,6 +75,8 @@ class Seizure {
       symptomsAfter: symptomsAfter ?? this.symptomsAfter,
       triggers: triggers ?? this.triggers,
       location: location ?? this.location,
+      roomId: roomId ?? this.roomId,
+      roomName: roomName ?? this.roomName,
       activity: activity ?? this.activity,
       medicationTaken: medicationTaken ?? this.medicationTaken,
       medicationName: medicationName ?? this.medicationName,
@@ -91,6 +99,8 @@ class Seizure {
       'symptomsAfter': symptomsAfter.join(','),
       'triggers': triggers.join(','),
       'location': location,
+      'roomId': roomId,
+      'roomName': roomName,
       'activity': activity,
       'medicationTaken': medicationTaken ? 1 : 0,
       'medicationName': medicationName,
@@ -125,6 +135,8 @@ class Seizure {
               .toList() ??
           [],
       location: map['location'] as String?,
+      roomId: map['roomId'] as String?,
+      roomName: map['roomName'] as String?,
       activity: map['activity'] as String?,
       medicationTaken: (map['medicationTaken'] as int) == 1,
       medicationName: map['medicationName'] as String?,

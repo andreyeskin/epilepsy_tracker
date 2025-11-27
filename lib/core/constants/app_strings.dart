@@ -35,7 +35,7 @@ class AppStrings {
   static const String medsTitle = 'Medikamente';
   static const String medsToday = 'Heute';
   static const String medsTomorrow = 'Morgen';
-  static const String medsAddNew = '+ Medikament hinzufügen';
+  static const String medsAddNew = 'Medikament hinzufügen';
   static const String medsTaken = 'GENOMMEN';
   static const String medsTake = 'NEHMEN';
   static const String medsTablets = 'Tabletten';

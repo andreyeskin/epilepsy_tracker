@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../models/seizure.dart';
 import '../services/seizure_database_service.dart';
 import '../core/constants/app_colors.dart';
+import '../features/indoor_lbs/presentation/providers/indoor_location_provider.dart';
 
 class SeizureLogScreen extends StatefulWidget {
   const SeizureLogScreen({super.key});
@@ -104,6 +106,10 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
         seconds: _durationSeconds,
       );
 
+      // Capture current room from Indoor-LBS if available
+      final indoorLocationProvider = context.read<IndoorLocationProvider>();
+      final currentRoom = indoorLocationProvider.currentRoom;
+
       final seizure = Seizure(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         dateTime: _selectedDateTime,
@@ -115,6 +121,8 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
         symptomsAfter: _selectedSymptomsAfter,
         triggers: _selectedTriggers,
         location: _location?.isEmpty == true ? null : _location,
+        roomId: currentRoom?.id,
+        roomName: currentRoom?.name,
         activity: _activity?.isEmpty == true ? null : _activity,
         medicationTaken: _medicationTaken,
         medicationName: _medicationName?.isEmpty == true ? null : _medicationName,

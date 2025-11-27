@@ -78,7 +78,7 @@ class SeizurePreview extends StatelessWidget {
     );
   }
 
-  Widget _buildSeizureItem(String type, String details, String time) {
+  Widget _buildSeizureItem(String type, String details, String time, {String? roomName}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -94,6 +94,27 @@ class SeizurePreview extends StatelessWidget {
                 details,
                 style: AppTextStyles.cardSubtitle,
               ),
+              if (roomName != null) ...[
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on,
+                      size: 14,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      roomName,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

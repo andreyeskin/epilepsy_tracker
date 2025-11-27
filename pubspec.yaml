@@ -63,6 +63,9 @@ dependencies:
   # Berechtigungen
   permission_handler: ^11.1.0
 
+  # BLE für Indoor-LBS
+  flutter_blue_plus: ^1.32.13
+
   # UI Helpers
   shimmer: ^3.0.0
 

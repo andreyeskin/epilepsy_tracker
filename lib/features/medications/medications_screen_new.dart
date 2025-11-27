@@ -223,8 +223,8 @@ class _MedicationsScreenNewState extends State<MedicationsScreenNew> {
             height: 48,
             decoration: BoxDecoration(
               color: isTaken
-                  ? AppColors.success.withOpacity(0.2)
-                  : AppColors.primary.withOpacity(0.2),
+                  ? AppColors.success.withValues(alpha: 0.2)
+                  : AppColors.primary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
             ),
             child: Icon(
@@ -254,16 +254,7 @@ class _MedicationsScreenNewState extends State<MedicationsScreenNew> {
           ),
 
           // Action Button
-          if (isToday)
-            _buildStatusButton(medication)
-          else
-            Text(
-              medication.formattedTime,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+          if (isToday) _buildStatusButton(medication),
         ],
       ),
     );
@@ -331,10 +322,10 @@ class _MedicationsScreenNewState extends State<MedicationsScreenNew> {
       child: Center(
         child: Column(
           children: [
-            Icon(
+            const Icon(
               Icons.medication_outlined,
               size: 48,
-              color: AppColors.textSecondary.withOpacity(0.5),
+              color: AppColors.textSecondary,
             ),
             const SizedBox(height: AppDimensions.spacingMd),
             Text(
