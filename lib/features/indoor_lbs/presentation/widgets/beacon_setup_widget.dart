@@ -25,45 +25,73 @@ class BeaconSetupWidget extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // Liste der Beacons
             if (beacons.isEmpty)
-              const Center(
+              Card(
                 child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Text(
-                    'Keine Beacons konfiguriert.\nFügen Sie einen Beacon hinzu, um zu beginnen.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey),
+                  padding: const EdgeInsets.all(32),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.bluetooth_disabled,
+                          size: 48,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Keine Beacons konfiguriert',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Fügen Sie einen Beacon hinzu, um zu beginnen.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               )
             else
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: beacons.length,
-                itemBuilder: (context, index) {
-                  final beacon = beacons[index];
-                  return _BeaconListItem(
-                    beacon: beacon,
-                    provider: provider,
-                    onEdit: () => _showEditBeaconDialog(
-                      context,
-                      provider,
-                      beacon,
-                    ),
-                    onDelete: () => _confirmDeleteBeacon(
-                      context,
-                      provider,
-                      beacon,
-                    ),
-                  );
-                },
+              Card(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemCount: beacons.length,
+                  separatorBuilder: (context, index) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final beacon = beacons[index];
+                    return _BeaconListItem(
+                      beacon: beacon,
+                      provider: provider,
+                      onEdit: () => _showEditBeaconDialog(
+                        context,
+                        provider,
+                        beacon,
+                      ),
+                      onDelete: () => _confirmDeleteBeacon(
+                        context,
+                        provider,
+                        beacon,
+                      ),
+                    );
+                  },
+                ),
               ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
 
             // Hinzufügen-Button am Ende
             SizedBox(
@@ -73,10 +101,14 @@ class BeaconSetupWidget extends StatelessWidget {
                 icon: const Icon(Icons.add),
                 label: const Text('Beacon hinzufügen'),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
+            const SizedBox(height: 8),
           ],
         );
       },
@@ -172,40 +204,104 @@ class _BeaconListItem extends StatelessWidget {
         ? provider.allRooms.where((r) => r.id == beacon.roomId).firstOrNull
         : null;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: (room?.riskLevel.color ?? Colors.grey).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
           Icons.bluetooth,
           color: room?.riskLevel.color ?? Colors.grey,
+          size: 24,
         ),
-        title: Text(beacon.name),
-        subtitle: Column(
+      ),
+      title: Text(
+        beacon.name,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+      ),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('UUID: ${beacon.uuid}'),
+            Text(
+              'UUID: ${beacon.uuid}',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 2),
             if (room != null)
-              Text('Raum: ${room.name}')
+              Row(
+                children: [
+                  Icon(
+                    room.icon,
+                    size: 14,
+                    color: room.riskLevel.color,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    room.name,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: room.riskLevel.color,
+                    ),
+                  ),
+                ],
+              )
             else
-              const Text(
-                'Kein Raum zugeordnet',
-                style: TextStyle(color: Colors.orange),
+              Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber,
+                    size: 14,
+                    color: Colors.orange[700],
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Kein Raum zugeordnet',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.orange[700],
+                    ),
+                  ),
+                ],
               ),
           ],
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: onEdit,
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.edit, size: 20),
+            onPressed: onEdit,
+            tooltip: 'Bearbeiten',
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(
+              minWidth: 40,
+              minHeight: 40,
             ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: onDelete,
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+            onPressed: onDelete,
+            tooltip: 'Löschen',
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(
+              minWidth: 40,
+              minHeight: 40,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

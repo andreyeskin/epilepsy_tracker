@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../data/models/beacon_model.dart';
 import '../../data/models/room_model.dart';
 import '../../data/repositories/beacon_repository.dart';
@@ -48,6 +49,7 @@ class IndoorLocationProvider with ChangeNotifier {
   RiskLevel get riskLevel => _riskLevel;
   Duration get timeInCurrentRoom => _timeInCurrentRoom;
   bool get isScanning => _isScanning;
+  bool get isMockMode => _scannerService.isMockMode;
   List<BeaconModel> get configuredBeacons => List.unmodifiable(_configuredBeacons);
   List<BeaconModel> get recentlyDetectedBeacons =>
       List.unmodifiable(_recentlyDetectedBeacons);
@@ -69,6 +71,13 @@ class IndoorLocationProvider with ChangeNotifier {
     }
 
     try {
+      // CRITICAL FIX: Request runtime permissions before scanning
+      final permissionsGranted = await _requestPermissions();
+      if (!permissionsGranted) {
+        debugPrint('Berechtigungen wurden nicht erteilt');
+        throw Exception('Bluetooth and Location permissions are required');
+      }
+
       _isScanning = true;
       notifyListeners();
 
@@ -88,6 +97,34 @@ class IndoorLocationProvider with ChangeNotifier {
       notifyListeners();
       rethrow;
     }
+  }
+
+  /// Requests necessary permissions for BLE scanning
+  Future<bool> _requestPermissions() async {
+    // Skip permission check in mock mode
+    if (isMockMode) return true;
+
+    // For Android 12+ (API 31+), we need BLUETOOTH_SCAN and BLUETOOTH_CONNECT
+    // For older versions, we need BLUETOOTH and LOCATION
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+      Permission.locationWhenInUse,
+    ].request();
+
+    // Check if all permissions are granted
+    bool allGranted = statuses.values.every(
+      (status) => status.isGranted || status.isLimited,
+    );
+
+    if (!allGranted) {
+      debugPrint('Nicht alle Berechtigungen erteilt:');
+      statuses.forEach((permission, status) {
+        debugPrint('  $permission: $status');
+      });
+    }
+
+    return allGranted;
   }
 
   /// Stoppt das BLE-Scanning

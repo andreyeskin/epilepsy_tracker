@@ -378,24 +378,75 @@ class _DetectedBeaconsList extends StatelessWidget {
     final beacons = provider.recentlyDetectedBeacons;
 
     return Card(
+      elevation: 2,
       child: ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         itemCount: beacons.length,
-        separatorBuilder: (context, index) => const Divider(),
+        separatorBuilder: (context, index) => const Divider(height: 1),
         itemBuilder: (context, index) {
           final beacon = beacons[index];
+          final isStrong = beacon.rssi > -70;
+          final distance = beacon.getEstimatedDistance();
+
           return ListTile(
-            leading: Icon(
-              Icons.bluetooth,
-              color: beacon.rssi > -70 ? Colors.green : Colors.orange,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: (isStrong ? Colors.green : Colors.orange).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.bluetooth,
+                color: isStrong ? Colors.green : Colors.orange,
+                size: 24,
+              ),
             ),
-            title: Text(beacon.name),
-            subtitle: Text('Signal: ${beacon.rssi} dBm'),
-            trailing: Text(
-              '${beacon.getEstimatedDistance().toStringAsFixed(1)}m',
+            title: Text(
+              beacon.name,
               style: const TextStyle(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+              ),
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.signal_cellular_alt,
+                    size: 14,
+                    color: Colors.grey[600],
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${beacon.rssi} dBm',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.blue.withOpacity(0.3),
+                ),
+              ),
+              child: Text(
+                '${distance.toStringAsFixed(1)}m',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: Colors.blue,
+                ),
               ),
             ),
           );
@@ -420,11 +471,27 @@ class _SettingsTab extends StatelessWidget {
               return Card(
                 child: SwitchListTile(
                   title: const Text('Demo-Modus'),
-                  subtitle: const Text(
-                    'Simuliert Beacons ohne echte Hardware',
+                  subtitle: Text(
+                    provider.isMockMode
+                        ? 'Simuliert Beacons ohne echte Hardware'
+                        : 'Verwendet echte Bluetooth-Beacons',
                   ),
-                  value: true, // Immer im Mock-Modus für Demo
-                  onChanged: null, // Deaktiviert für Demo
+                  value: provider.isMockMode,
+                  onChanged: provider.isScanning
+                      ? null // Deaktiviert während Scanning läuft
+                      : (value) {
+                          provider.setMockMode(value);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                value
+                                    ? 'Demo-Modus aktiviert'
+                                    : 'Echter Bluetooth-Modus aktiviert',
+                              ),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
                 ),
               );
             },

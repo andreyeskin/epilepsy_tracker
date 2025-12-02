@@ -58,11 +58,14 @@ class DetectCurrentRoom {
       final room = entry.key;
       final beacons = entry.value;
 
+      // CRITICAL FIX: Check if beacons list is empty before reduce()
       // Verwende durchschnittlichen RSSI wenn mehrere Beacons im Raum
-      final avgRssi = beacons.isEmpty
-          ? minRssiThreshold
-          : beacons.map((b) => b.rssi).reduce((a, b) => a + b) ~/
-              beacons.length;
+      if (beacons.isEmpty) {
+        continue; // Skip this room if no beacons
+      }
+
+      final avgRssi = beacons.map((b) => b.rssi).reduce((a, b) => a + b) ~/
+          beacons.length;
 
       // Aktualisiere besten Raum wenn RSSI stärker
       if (avgRssi > bestRssi) {
@@ -135,6 +138,14 @@ class DetectCurrentRoom {
     // Berechne Konfidenz basierend auf:
     // - Anzahl der erkannten Beacons
     // - Durchschnittliche Signalstärke
+    // CRITICAL FIX: This is already protected by isEmpty check above, but add safety
+    if (roomBeacons.length == 1) {
+      // If only one beacon, use its RSSI directly
+      final avgRssi = roomBeacons.first.rssi.toDouble();
+      final rssiConfidence = ((avgRssi + 90) / 50).clamp(0.0, 1.0);
+      return rssiConfidence;
+    }
+
     final avgRssi = roomBeacons.map((b) => b.rssi).reduce((a, b) => a + b) /
         roomBeacons.length;
 

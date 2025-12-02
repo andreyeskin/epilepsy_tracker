@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../models/beacon_model.dart';
 
@@ -14,7 +15,7 @@ class BleScannerService {
 
   // Scanning-Status
   bool _isScanning = false;
-  bool _useMockMode = true; // Standard: Mock-Modus für Tests
+  bool _useMockMode = false; // Standard: Echter Bluetooth-Modus
   Timer? _mockTimer;
   final Random _random = Random();
 
@@ -33,7 +34,7 @@ class BleScannerService {
       final adapterState = await FlutterBluePlus.adapterState.first;
       return adapterState == BluetoothAdapterState.on;
     } catch (e) {
-      print('Fehler beim Prüfen der Bluetooth-Verfügbarkeit: $e');
+      debugPrint('Fehler beim Prüfen der Bluetooth-Verfügbarkeit: $e');
       return false;
     }
   }
@@ -54,12 +55,12 @@ class BleScannerService {
     int scanDuration = 3,
   }) async {
     if (_isScanning) {
-      print('Scanning läuft bereits');
+      debugPrint('Scanning läuft bereits');
       return;
     }
 
     _isScanning = true;
-    print('Starte BLE-Scanning (Mock-Modus: $_useMockMode)');
+    debugPrint('Starte BLE-Scanning (Mock-Modus: $_useMockMode)');
 
     if (_useMockMode) {
       _startMockScanning(scanInterval);
@@ -141,6 +142,8 @@ class BleScannerService {
 
   /// Startet echtes BLE-Scanning mit flutter_blue_plus
   Future<void> _startRealScanning(int interval, int duration) async {
+    StreamSubscription? subscription;
+
     try {
       // Prüfe ob Bluetooth eingeschaltet ist
       final isAvailable = await isBluetoothAvailable();
@@ -164,23 +167,60 @@ class BleScannerService {
           );
 
           // Höre auf Scan-Ergebnisse
-          final subscription = FlutterBluePlus.scanResults.listen((results) {
-            for (var result in results) {
-              final device = result.device;
-              final rssi = result.rssi;
+          // CRITICAL FIX: Wrapped callback in try/catch to prevent unhandled exceptions
+          subscription = FlutterBluePlus.scanResults.listen((results) {
+            try {
+              debugPrint('📡 BLE Scan: ${results.length} Geräte gefunden');
 
-              // Erstelle BeaconModel
-              final beacon = BeaconModel(
-                uuid: device.remoteId.toString(),
-                name: device.platformName.isNotEmpty
+              for (var result in results) {
+                final device = result.device;
+                final rssi = result.rssi;
+                final advData = result.advertisementData;
+
+                // Debug-Log für jedes gefundene Gerät
+                debugPrint('  🔹 Gerät gefunden:');
+                debugPrint('     ID: ${device.remoteId}');
+                debugPrint('     Name: ${device.platformName.isEmpty ? "(leer)" : device.platformName}');
+                debugPrint('     RSSI: $rssi dBm');
+                debugPrint('     ServiceUUIDs: ${advData.serviceUuids}');
+                debugPrint('     ManufacturerData: ${advData.manufacturerData}');
+
+                // Versuche iBeacon UUID zu extrahieren
+                String uuid = device.remoteId.toString();
+                String name = device.platformName.isNotEmpty
                     ? device.platformName
-                    : 'Unbekannter Beacon',
-                roomId: null, // Wird später zugeordnet
-                rssi: rssi,
-                lastSeen: DateTime.now(),
-              );
+                    : 'BLE Device ${device.remoteId.toString().substring(0, 8)}';
 
-              _detectedBeacons[beacon.uuid] = beacon;
+                // Check für iBeacon Format (Apple Company ID: 0x004C)
+                if (advData.manufacturerData.containsKey(76)) { // 76 = 0x004C = Apple
+                  final data = advData.manufacturerData[76]!;
+                  if (data.length >= 23 && data[0] == 0x02 && data[1] == 0x15) {
+                    // iBeacon Format erkannt!
+                    // UUID ist bei Bytes 2-17 (16 bytes)
+                    final uuidBytes = data.sublist(2, 18);
+                    uuid = _bytesToUuid(uuidBytes);
+                    name = 'iBeacon ${uuid.substring(0, 8)}';
+                    debugPrint('     ✅ iBeacon erkannt! UUID: $uuid');
+                  }
+                }
+
+                // Erstelle BeaconModel
+                final beacon = BeaconModel(
+                  uuid: uuid,
+                  name: name,
+                  roomId: null, // Wird später zugeordnet
+                  rssi: rssi,
+                  lastSeen: DateTime.now(),
+                );
+
+                _detectedBeacons[beacon.uuid] = beacon;
+                debugPrint('     ➡️ Als Beacon gespeichert: $uuid');
+              }
+
+              debugPrint('📊 Total ${_detectedBeacons.length} Beacons im Cache');
+            } catch (callbackError) {
+              // CRITICAL FIX: Catch exceptions in callback to prevent scan stopping
+              debugPrint('Fehler im Scan-Callback: $callbackError');
             }
           });
 
@@ -189,16 +229,20 @@ class BleScannerService {
 
           // Stoppe Scan
           await FlutterBluePlus.stopScan();
-          await subscription.cancel();
+          await subscription?.cancel();
 
           // Sende Ergebnisse
           _scanResultsController.add(_detectedBeacons.values.toList());
         } catch (e) {
-          print('Fehler beim BLE-Scanning: $e');
+          debugPrint('Fehler beim BLE-Scanning: $e');
+          // CRITICAL FIX: Cancel subscription on error to prevent memory leak
+          await subscription?.cancel();
         }
       });
     } catch (e) {
-      print('Fehler beim Starten des BLE-Scannings: $e');
+      debugPrint('Fehler beim Starten des BLE-Scannings: $e');
+      // CRITICAL FIX: Cancel subscription on error to prevent memory leak
+      await subscription?.cancel();
       _isScanning = false;
     }
   }
@@ -216,12 +260,12 @@ class BleScannerService {
       try {
         await FlutterBluePlus.stopScan();
       } catch (e) {
-        print('Fehler beim Stoppen des BLE-Scans: $e');
+        debugPrint('Fehler beim Stoppen des BLE-Scans: $e');
       }
     }
 
     _detectedBeacons.clear();
-    print('BLE-Scanning gestoppt');
+    debugPrint('BLE-Scanning gestoppt');
   }
 
   /// Gibt zurück ob gerade gescannt wird
@@ -229,6 +273,19 @@ class BleScannerService {
 
   /// Gibt zurück ob Mock-Modus aktiv ist
   bool get isMockMode => _useMockMode;
+
+  /// Konvertiert Byte-Array zu UUID-String
+  String _bytesToUuid(List<int> bytes) {
+    if (bytes.length != 16) return bytes.toString();
+
+    String toHex(int byte) => byte.toRadixString(16).padLeft(2, '0');
+
+    return '${bytes.sublist(0, 4).map(toHex).join()}-'
+        '${bytes.sublist(4, 6).map(toHex).join()}-'
+        '${bytes.sublist(6, 8).map(toHex).join()}-'
+        '${bytes.sublist(8, 10).map(toHex).join()}-'
+        '${bytes.sublist(10, 16).map(toHex).join()}';
+  }
 
   /// Aufräumen
   void dispose() {
