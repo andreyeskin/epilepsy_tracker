@@ -60,7 +60,7 @@ class MonthSelector extends StatelessWidget {
           IconButton(
             onPressed: isCurrentMonth ? null : onNext,
             icon: const Icon(Icons.chevron_right),
-            color: isCurrentMonth ? AppColors.textSecondary.withOpacity(0.3) : AppColors.textPrimary,
+            color: isCurrentMonth ? AppColors.textSecondary.withValues(alpha: 0.3) : AppColors.textPrimary,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
           ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_animations.dart';
 
 /// Relaxation Screen - Ruheraum
 /// Ermöglicht Auswahl von Meditation-Szenen und Dauer
@@ -65,25 +65,27 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Ruheraum'),
-        backgroundColor: AppColors.primary,
+        backgroundColor: const Color(0xFF4CAF93),
         foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppDimensions.spacingLg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
             // Scene Selection
             Text(
               'Szene wählen',
-              style: AppTextStyles.h4,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: AppDimensions.spacingMd),
             _buildSceneGrid(),
@@ -92,7 +94,11 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
             // Duration Selection
             Text(
               'Dauer wählen',
-              style: AppTextStyles.h4,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: AppDimensions.spacingMd),
             _buildDurationChips(),
@@ -136,7 +142,9 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
               _selectedScene = scene['id'];
             });
           },
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
             decoration: BoxDecoration(
               gradient: scene['gradient'],
               borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
@@ -147,12 +155,18 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.4),
+                        color: const Color(0xFF4CAF93).withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
                     ]
-                  : [],
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
             ),
             child: Stack(
               children: [
@@ -160,7 +174,7 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
                   child: Icon(
                     scene['icon'],
                     size: 48,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
                 Positioned(
@@ -175,7 +189,7 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
                       fontWeight: FontWeight.w600,
                       shadows: [
                         Shadow(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha: 0.5),
                           blurRadius: 4,
                         ),
                       ],
@@ -194,7 +208,7 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
                       ),
                       child: const Icon(
                         Icons.check,
-                        color: AppColors.primary,
+                        color: Color(0xFF4CAF93),
                         size: 16,
                       ),
                     ),
@@ -213,27 +227,67 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
       runSpacing: AppDimensions.spacingMd,
       children: _durations.map((duration) {
         final isSelected = _selectedDuration == duration;
-        final label = duration == null
-            ? 'Frei'
-            : '$duration Min.';
+        final label = duration == null ? 'Frei' : '$duration Min.';
 
-        return ChoiceChip(
-          label: Text(label),
-          selected: isSelected,
-          onSelected: (selected) {
+        return InkWell(
+          onTap: () {
             setState(() {
               _selectedDuration = duration;
             });
           },
-          backgroundColor: const Color(0xFFF5F5F5),
-          selectedColor: AppColors.primary,
-          labelStyle: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textPrimary,
-            fontWeight: FontWeight.w500,
-          ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.spacingLg,
-            vertical: AppDimensions.spacingMd,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+          child: AnimatedContainer(
+            duration: AppAnimations.durationShort,
+            curve: AppAnimations.curveEmphasized,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spacingXl,
+              vertical: AppDimensions.spacingMd,
+            ),
+            decoration: BoxDecoration(
+              gradient: isSelected
+                  ? const LinearGradient(
+                      colors: [Color(0xFF4CAF93), Color(0xFF66BB9A)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : null,
+              color: isSelected ? null : AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              border: Border.all(
+                color: isSelected ? Colors.transparent : AppColors.outline,
+                width: 1,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFF4CAF93).withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isSelected)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppDimensions.spacingSm),
+                    child: Icon(
+                      Icons.check_circle_rounded,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                Text(
+                  label,
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: isSelected ? Colors.white : AppColors.textPrimary,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }).toList(),
@@ -246,16 +300,18 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
       children: [
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.air,
-              color: AppColors.primary,
+              color: Color(0xFF4CAF93),
               size: 24,
             ),
             const SizedBox(width: AppDimensions.spacingSm),
             Text(
               'Geführte Atmung',
-              style: AppTextStyles.h4.copyWith(
-                color: AppColors.primary,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF4CAF93),
               ),
             ),
           ],
@@ -291,7 +347,7 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
             Icon(
               Icons.self_improvement,
               size: 80,
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
             const SizedBox(height: AppDimensions.spacingMd),
             Text(
@@ -310,12 +366,14 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
   Widget _buildStartButton() {
     final canStart = _selectedScene != null && _selectedDuration != null;
 
-    return SizedBox(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
       width: double.infinity,
       height: AppDimensions.buttonHeightLg,
       child: ElevatedButton.icon(
         onPressed: canStart ? _startSession : null,
-        icon: const Icon(Icons.play_arrow),
+        icon: const Icon(Icons.play_arrow, size: 24),
         label: const Text(
           'Starten',
           style: TextStyle(
@@ -324,14 +382,15 @@ class _RelaxationScreenNewState extends State<RelaxationScreenNew> {
           ),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFE8E8E8),
-          foregroundColor: AppColors.textSecondary,
+          backgroundColor: canStart ? const Color(0xFF4CAF93) : const Color(0xFFE8E8E8),
+          foregroundColor: canStart ? Colors.white : AppColors.textSecondary,
           disabledBackgroundColor: const Color(0xFFE8E8E8),
           disabledForegroundColor: AppColors.textSecondary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
           ),
-          elevation: 0,
+          elevation: canStart ? 4 : 0,
+          shadowColor: canStart ? const Color(0xFF4CAF93).withValues(alpha: 0.4) : null,
         ),
       ),
     );

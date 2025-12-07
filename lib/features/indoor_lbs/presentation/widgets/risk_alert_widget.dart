@@ -269,7 +269,7 @@ class _TimerDisplay extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             timeRemaining.inSeconds > 0
-                ? 'Empfohlene Verweildauer endet in ${minutes}:${seconds.toString().padLeft(2, '0')} min'
+                ? 'Empfohlene Verweildauer endet in $minutes:${seconds.toString().padLeft(2, '0')} min'
                 : 'Empfohlene Verweildauer überschritten',
             style: const TextStyle(
               fontWeight: FontWeight.w600,
@@ -298,7 +298,7 @@ class RiskLevelIndicator extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: evaluation.riskLevel.color.withOpacity(0.1),
+            color: evaluation.riskLevel.color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: evaluation.riskLevel.color,

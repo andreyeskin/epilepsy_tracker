@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../features/insights/widgets/trigger_donut_chart.dart';
 
 class InsightsScreen extends StatelessWidget {
   const InsightsScreen({super.key});
@@ -26,8 +27,8 @@ class InsightsScreen extends StatelessWidget {
                   const Text(
                     'Übersicht',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   Container(
@@ -67,7 +68,7 @@ class InsightsScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
+                      color: Colors.black.withValues(alpha: 0.03),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -87,8 +88,8 @@ class InsightsScreen extends StatelessWidget {
                         Text(
                           'Anfälle diesen Monat',
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
@@ -257,137 +258,14 @@ class InsightsScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              // Auslöser-Verteilung - Pie Chart
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF7FAF9),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(
-                          Icons.pie_chart,
-                          size: 18,
-                          color: Color(0xFF4CAF93),
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          'Auslöser-Verteilung',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: SizedBox(
-                            height: 120,
-                            child: PieChart(
-                              PieChartData(
-                                sectionsSpace: 2,
-                                centerSpaceRadius: 30,
-                                sections: [
-                                  PieChartSectionData(
-                                    value: 40,
-                                    title: '40%',
-                                    color: const Color(0xFF4CAF93),
-                                    radius: 45,
-                                    titleStyle: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  PieChartSectionData(
-                                    value: 30,
-                                    title: '30%',
-                                    color: const Color(0xFFA6D5C4),
-                                    radius: 45,
-                                    titleStyle: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  PieChartSectionData(
-                                    value: 20,
-                                    title: '20%',
-                                    color: const Color(0xFF8FD1B7),
-                                    radius: 45,
-                                    titleStyle: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  PieChartSectionData(
-                                    value: 10,
-                                    title: '10%',
-                                    color: const Color(0xFF3A8C78),
-                                    radius: 45,
-                                    titleStyle: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        const Expanded(
-                          flex: 3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _LegendItem(
-                                color: Color(0xFF4CAF93),
-                                label: 'Stress',
-                                percentage: '40%',
-                              ),
-                              SizedBox(height: 8),
-                              _LegendItem(
-                                color: Color(0xFFA6D5C4),
-                                label: 'Schlafmangel',
-                                percentage: '30%',
-                              ),
-                              SizedBox(height: 8),
-                              _LegendItem(
-                                color: Color(0xFF8FD1B7),
-                                label: 'Vergessene Medikation',
-                                percentage: '20%',
-                              ),
-                              SizedBox(height: 8),
-                              _LegendItem(
-                                color: Color(0xFF3A8C78),
-                                label: 'Unbekannt',
-                                percentage: '10%',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              // Auslöser-Verteilung - Donut Chart mejorado
+              TriggerDonutChart(
+                triggerData: {
+                  'Stress': 40,
+                  'Schlafmangel': 30,
+                  'Vergessene Medikation': 20,
+                  'Unbekannt': 10,
+                },
               ),
 
               const SizedBox(height: 24),
@@ -396,11 +274,11 @@ class InsightsScreen extends StatelessWidget {
               const Text(
                 'Medikamenten-Adhärenz',
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 13),
 
               Container(
                 padding: const EdgeInsets.all(16),
@@ -409,7 +287,7 @@ class InsightsScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
+                      color: Colors.black.withValues(alpha: 0.03),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -432,8 +310,8 @@ class InsightsScreen extends StatelessWidget {
                             Text(
                               'Einnahme-Trend',
                               style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -515,7 +393,7 @@ class InsightsScreen extends StatelessWidget {
                               belowBarData: BarAreaData(
                                 show: true,
                                 color:
-                                const Color(0xFF4CAF93).withOpacity(0.1),
+                                const Color(0xFF4CAF93).withValues(alpha: 0.1),
                               ),
                             ),
                           ],

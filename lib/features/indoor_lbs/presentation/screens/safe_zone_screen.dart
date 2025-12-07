@@ -165,7 +165,7 @@ class _CurrentLocationCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           gradient: LinearGradient(
             colors: [
-              riskLevel.color.withOpacity(0.7),
+              riskLevel.color.withValues(alpha: 0.7),
               riskLevel.color,
             ],
             begin: Alignment.topLeft,
@@ -339,7 +339,7 @@ class _RoomCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: room.riskLevel.color.withOpacity(0.2),
+                  color: room.riskLevel.color.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -395,7 +395,7 @@ class _DetectedBeaconsList extends StatelessWidget {
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: (isStrong ? Colors.green : Colors.orange).withOpacity(0.1),
+                color: (isStrong ? Colors.green : Colors.orange).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -434,10 +434,10 @@ class _DetectedBeaconsList extends StatelessWidget {
             trailing: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+                color: Colors.blue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.blue.withOpacity(0.3),
+                  color: Colors.blue.withValues(alpha: 0.3),
                 ),
               ),
               child: Text(

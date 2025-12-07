@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
@@ -45,7 +46,7 @@ class FitbitService {
       final code = Uri.parse(result).queryParameters['code'];
 
       if (code == null || code.isEmpty) {
-        print('No authorization code received');
+        debugPrint('No authorization code received');
         return false;
       }
 
@@ -71,14 +72,14 @@ class FitbitService {
         await _storage.write(key: _accessTokenKey, value: data['access_token']);
         await _storage.write(key: _refreshTokenKey, value: data['refresh_token']);
 
-        print('Authorization successful! User ID: ${data['user_id']}');
+        debugPrint('Authorization successful! User ID: ${data['user_id']}');
         return true;
       } else {
-        print('Token exchange failed: ${tokenResponse.statusCode} - ${tokenResponse.body}');
+        debugPrint('Token exchange failed: ${tokenResponse.statusCode} - ${tokenResponse.body}');
         return false;
       }
     } catch (e) {
-      print('Error during authorization: $e');
+      debugPrint('Error during authorization: $e');
       return false;
     }
   }
@@ -93,7 +94,7 @@ class FitbitService {
              accessToken != null &&
              accessToken.isNotEmpty;
     } catch (e) {
-      print('Error checking authentication: $e');
+      debugPrint('Error checking authentication: $e');
       return false;
     }
   }
@@ -103,7 +104,7 @@ class FitbitService {
     try {
       return await _storage.read(key: _accessTokenKey);
     } catch (e) {
-      print('Error reading access token: $e');
+      debugPrint('Error reading access token: $e');
       return null;
     }
   }
@@ -138,11 +139,11 @@ class FitbitService {
         }
         throw Exception('Authentifizierung fehlgeschlagen');
       } else {
-        print('Get steps failed: ${response.statusCode} - ${response.body}');
+        debugPrint('Get steps failed: ${response.statusCode} - ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Error getting steps: $e');
+      debugPrint('Error getting steps: $e');
       return null;
     }
   }
@@ -181,11 +182,11 @@ class FitbitService {
         }
         throw Exception('Authentifizierung fehlgeschlagen');
       } else {
-        print('Get heart rate failed: ${response.statusCode} - ${response.body}');
+        debugPrint('Get heart rate failed: ${response.statusCode} - ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Error getting heart rate: $e');
+      debugPrint('Error getting heart rate: $e');
       return null;
     }
   }
@@ -216,11 +217,11 @@ class FitbitService {
         await _storage.write(key: _refreshTokenKey, value: data['refresh_token']);
         return true;
       } else {
-        print('Token refresh failed: ${response.statusCode} - ${response.body}');
+        debugPrint('Token refresh failed: ${response.statusCode} - ${response.body}');
         return false;
       }
     } catch (e) {
-      print('Error refreshing token: $e');
+      debugPrint('Error refreshing token: $e');
       return false;
     }
   }
@@ -232,7 +233,7 @@ class FitbitService {
       await _storage.delete(key: _accessTokenKey);
       await _storage.delete(key: _refreshTokenKey);
     } catch (e) {
-      print('Error deleting tokens: $e');
+      debugPrint('Error deleting tokens: $e');
     }
   }
 }

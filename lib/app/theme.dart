@@ -81,7 +81,7 @@ class AppTheme {
         ),
         labelStyle: AppTextStyles.label,
         hintStyle: AppTextStyles.bodyMedium.copyWith(
-          color: AppColors.textSecondary.withOpacity(0.6),
+          color: AppColors.textSecondary.withValues(alpha: 0.6),
         ),
       ),
 

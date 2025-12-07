@@ -21,7 +21,7 @@ class InsightsScreenNew extends StatefulWidget {
 
 class _InsightsScreenNewState extends State<InsightsScreenNew> {
   DateTime _selectedMonth = DateTime.now();
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   // Demo Daten
   final List<int> _weeklySeizures = [2, 1, 0, 0]; // 4 Wochen
@@ -36,7 +36,7 @@ class _InsightsScreenNewState extends State<InsightsScreenNew> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.cardBackground,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -48,9 +48,18 @@ class _InsightsScreenNewState extends State<InsightsScreenNew> {
                     // Header
                     Text(
                       AppStrings.insightsTitle,
-                      style: AppTextStyles.h1,
+                      style: AppTextStyles.headlineMedium.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    const SizedBox(height: AppDimensions.spacingXxl),
+                    const SizedBox(height: AppDimensions.spacingSm),
+                    Text(
+                      'Deine persönlichen Gesundheitsstatistiken',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: AppDimensions.spacingXl),
 
                     // Month Selector
                     MonthSelector(
@@ -67,9 +76,23 @@ class _InsightsScreenNewState extends State<InsightsScreenNew> {
                         weeklyData: _weeklySeizures,
                       ),
                     ),
-                    const SizedBox(height: AppDimensions.spacingLg),
+                    const SizedBox(height: AppDimensions.spacingXl),
 
-                    // Stats Summary
+                    // Stats Summary with Title
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: AppDimensions.spacingXs,
+                        bottom: AppDimensions.spacingMd,
+                      ),
+                      child: Text(
+                        'Übersicht',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
                     StatsSummaryRow(
                       totalSeizures: _calculateTotal(),
                       changePercentage: _calculateChange(),
@@ -80,6 +103,7 @@ class _InsightsScreenNewState extends State<InsightsScreenNew> {
                     // Trigger Distribution
                     _buildSection(
                       title: AppStrings.insightsTriggersTitle,
+                      showTitle: false, // El título está dentro del widget TriggerDonutChart
                       child: TriggerDonutChart(
                         triggerData: _triggers,
                       ),
@@ -114,26 +138,40 @@ class _InsightsScreenNewState extends State<InsightsScreenNew> {
     );
   }
 
-  Widget _buildSection({required String title, required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppDimensions.spacingLg),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        border: Border.all(color: AppColors.divider),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: AppTextStyles.h4,
+  Widget _buildSection({required String title, required Widget child, bool showTitle = true}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title outside the card for better visibility
+        if (showTitle)
+          Padding(
+            padding: const EdgeInsets.only(
+              left: AppDimensions.spacingXs,
+              bottom: AppDimensions.spacingMd,
+            ),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
           ),
-          const SizedBox(height: AppDimensions.spacingMd),
-          child,
-        ],
-      ),
+        // Card content
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppDimensions.spacingLg),
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+            boxShadow: [
+              AppColors.elevation2,
+            ],
+          ),
+          child: child,
+        ),
+      ],
     );
   }
 
@@ -141,9 +179,14 @@ class _InsightsScreenNewState extends State<InsightsScreenNew> {
     return Column(
       children: [
         // Export Button
-        SizedBox(
+        Container(
           width: double.infinity,
           height: AppDimensions.buttonHeightLg,
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+            boxShadow: [AppColors.elevation2],
+          ),
           child: ElevatedButton.icon(
             onPressed: _exportReport,
             icon: const Icon(Icons.file_download),
@@ -152,11 +195,12 @@ class _InsightsScreenNewState extends State<InsightsScreenNew> {
               style: AppTextStyles.button,
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: Colors.transparent,
               foregroundColor: AppColors.textOnPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
               ),
+              shadowColor: Colors.transparent,
             ),
           ),
         ),
@@ -176,10 +220,12 @@ class _InsightsScreenNewState extends State<InsightsScreenNew> {
               ),
             ),
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppColors.primary, width: 2),
+              side: const BorderSide(color: AppColors.primary, width: 1.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
               ),
+              backgroundColor: AppColors.surface,
+              foregroundColor: AppColors.primary,
             ),
           ),
         ),

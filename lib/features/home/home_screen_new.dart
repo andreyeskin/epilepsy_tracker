@@ -4,10 +4,11 @@ import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../screens/seizure_log_screen.dart';
+import '../../screens/seizure_history_screen.dart';
 import '../../screens/fhir_demo_screen.dart';
 import '../../screens/insights_screen.dart';
 import '../../features/medications/medications_screen_new.dart';
-import '../../screens/relaxation_screen.dart';
+import '../../features/relaxation/relaxation_screen_new.dart';
 import '../../services/fitbit_service.dart';
 import 'widgets/greeting_header.dart';
 import 'widgets/quick_actions_grid.dart';
@@ -121,7 +122,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -131,12 +132,16 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
               children: [
                 // Greeting Header
                 const GreetingHeader(),
-                const SizedBox(height: AppDimensions.spacingXxl),
+                const SizedBox(height: AppDimensions.spacingXl),
 
                 // Schnellaktionen
                 Text(
                   'Schnellaktionen',
-                  style: AppTextStyles.h4,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: AppDimensions.spacingMd),
                 QuickActionsGrid(
@@ -160,7 +165,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const RelaxationScreen(),
+                        builder: (context) => const RelaxationScreenNew(),
                       ),
                     );
                   },
@@ -173,12 +178,16 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                     );
                   },
                 ),
-                const SizedBox(height: AppDimensions.spacingXxl),
+                const SizedBox(height: AppDimensions.spacingXl),
 
                 // Aktueller Standort (Indoor-LBS)
                 Text(
                   'Standort & Sicherheit',
-                  style: AppTextStyles.h4,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: AppDimensions.spacingMd),
                 RoomIndicatorWidget(
@@ -192,12 +201,16 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                     );
                   },
                 ),
-                const SizedBox(height: AppDimensions.spacingXxl),
+                const SizedBox(height: AppDimensions.spacingXl),
 
                 // FHIR Integration (Entwicklung)
                 Text(
                   'Entwicklung & Testing',
-                  style: AppTextStyles.h4,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: AppDimensions.spacingMd),
                 Row(
@@ -244,7 +257,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                                 'FHIR Integration',
                                 textAlign: TextAlign.center,
                                 style: AppTextStyles.bodySmall.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 11,
                                 ),
                               ),
@@ -296,7 +309,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                                 'Indoor-LBS',
                                 textAlign: TextAlign.center,
                                 style: AppTextStyles.bodySmall.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 11,
                                 ),
                               ),
@@ -307,12 +320,16 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                     ),
                   ],
                 ),
-                const SizedBox(height: AppDimensions.spacingXxl),
+                const SizedBox(height: AppDimensions.spacingXl),
 
                 // Fitbit Aktivitätsdaten
                 Text(
                   AppStrings.homeFitbitData,
-                  style: AppTextStyles.h4,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: AppDimensions.spacingMd),
                 _buildFitbitSection(),
@@ -337,7 +354,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const SeizureLogScreen(),
+                        builder: (context) => const SeizureHistoryScreen(),
                       ),
                     );
                   },
@@ -359,7 +376,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),

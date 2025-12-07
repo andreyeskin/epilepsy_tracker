@@ -25,8 +25,9 @@ class StatsSummaryRow extends StatelessWidget {
           child: _StatCard(
             label: 'Gesamt',
             value: totalSeizures.toString(),
-            icon: Icons.event_note,
+            icon: Icons.event_note_rounded,
             color: AppColors.primary,
+            gradient: AppColors.primaryGradient,
           ),
         ),
         const SizedBox(width: AppDimensions.spacingMd),
@@ -34,8 +35,13 @@ class StatsSummaryRow extends StatelessWidget {
           child: _StatCard(
             label: 'Veränderung',
             value: '${changePercentage >= 0 ? '+' : ''}${changePercentage.toInt()}%',
-            icon: changePercentage >= 0 ? Icons.trending_up : Icons.trending_down,
+            icon: changePercentage >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
             color: changePercentage >= 0 ? AppColors.error : AppColors.success,
+            gradient: LinearGradient(
+              colors: changePercentage >= 0
+                  ? [AppColors.error, AppColors.errorLight]
+                  : [AppColors.success, AppColors.successLight],
+            ),
           ),
         ),
         const SizedBox(width: AppDimensions.spacingMd),
@@ -43,8 +49,9 @@ class StatsSummaryRow extends StatelessWidget {
           child: _StatCard(
             label: 'Ø pro Woche',
             value: averagePerWeek.toStringAsFixed(1),
-            icon: Icons.bar_chart,
+            icon: Icons.bar_chart_rounded,
             color: AppColors.info,
+            gradient: AppColors.accentGradient,
           ),
         ),
       ],
@@ -57,50 +64,61 @@ class _StatCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
+  final Gradient gradient;
 
   const _StatCard({
     required this.label,
     required this.value,
     required this.icon,
     required this.color,
+    required this.gradient,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.spacingLg),
+      padding: const EdgeInsets.all(AppDimensions.spacingMd),
       decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-        border: Border.all(color: AppColors.divider),
+        color: AppColors.cardBackground,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        boxShadow: [AppColors.elevation1],
       ),
       child: Column(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+              gradient: gradient,
+              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Icon(
               icon,
-              color: color,
-              size: 20,
+              color: AppColors.textOnPrimary,
+              size: 24,
             ),
           ),
-          const SizedBox(height: AppDimensions.spacingSm),
+          const SizedBox(height: AppDimensions.spacingMd),
           Text(
             value,
-            style: AppTextStyles.h3.copyWith(
+            style: AppTextStyles.h4.copyWith(
               color: color,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: AppDimensions.spacingXs),
           Text(
             label,
-            style: AppTextStyles.labelSmall,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
             textAlign: TextAlign.center,
           ),
         ],

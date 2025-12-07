@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../widgets/quick_action_card.dart';
 
 /// 4 Action Cards Grid
@@ -30,8 +29,8 @@ class QuickActionsGrid extends StatelessWidget {
       children: [
         QuickActionCard(
           icon: Icons.add_circle_outline,
-          title: 'Anfall\nprotokollieren',
-          description: 'Schnelle\nDokumentation',
+          title: 'Anfall protokollieren',
+          description: 'Schnelle Dokumentation',
           color: const Color(0xFF8FD1B7),
           onTap: onSeizureLog,
         ),
@@ -45,7 +44,7 @@ class QuickActionsGrid extends StatelessWidget {
         QuickActionCard(
           icon: Icons.self_improvement,
           title: 'Ruheraum',
-          description: 'Entspannung &\nAtmung',
+          description: 'Entspannung & Atmung',
           color: const Color(0xFF3A8C78),
           onTap: onRelaxation,
         ),

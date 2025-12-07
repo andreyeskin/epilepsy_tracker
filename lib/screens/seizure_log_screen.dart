@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../models/seizure.dart';
 import '../services/seizure_database_service.dart';
 import '../core/constants/app_colors.dart';
+import '../core/constants/app_dimensions.dart';
+import '../core/constants/app_text_styles.dart';
 import '../features/indoor_lbs/presentation/providers/indoor_location_provider.dart';
 
 class SeizureLogScreen extends StatefulWidget {
@@ -160,83 +162,208 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Anfall protokollieren'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppDimensions.spacingLg),
           children: [
+            // Header
+            Text(
+              'Dokumentiere deinen Anfall',
+              style: AppTextStyles.headlineSmall.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacingSm),
+            Text(
+              'Je detaillierter deine Angaben, desto besser können wir Muster erkennen',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacingXl),
+
             // Datum und Zeit
-            _buildSection(
+            _buildModernSection(
               title: 'Wann ist der Anfall aufgetreten?',
-              icon: Icons.calendar_today,
-              child: Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ListTile(
-                  leading: const Icon(Icons.access_time, color: AppColors.primary),
-                  title: const Text('Datum und Uhrzeit'),
-                  subtitle: Text(
-                    DateFormat('dd.MM.yyyy - HH:mm').format(_selectedDateTime),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+              icon: Icons.event_rounded,
+              child: InkWell(
+                onTap: _selectDateTime,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                child: Container(
+                  padding: const EdgeInsets.all(AppDimensions.spacingLg),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      width: 2,
                     ),
                   ),
-                  trailing: const Icon(Icons.edit),
-                  onTap: _selectDateTime,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Typ des Anfalls
-            _buildSection(
-              title: 'Art des Anfalls',
-              icon: Icons.analytics,
-              child: Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: SeizureType.values.map((type) {
-                      return RadioListTile<SeizureType>(
-                        title: Text(type.displayName),
-                        subtitle: Text(
-                          type.description,
-                          style: const TextStyle(fontSize: 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(AppDimensions.spacingMd),
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryGradient,
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
                         ),
-                        value: type,
-                        groupValue: _selectedType,
-                        activeColor: AppColors.primary,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedType = value!;
-                          });
-                        },
-                      );
-                    }).toList(),
+                        child: const Icon(
+                          Icons.access_time_rounded,
+                          color: Colors.white,
+                          size: AppDimensions.iconMd,
+                        ),
+                      ),
+                      const SizedBox(width: AppDimensions.spacingLg),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Datum und Uhrzeit',
+                              style: AppTextStyles.labelLarge.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: AppDimensions.spacingXs),
+                            Text(
+                              DateFormat('dd.MM.yyyy - HH:mm').format(_selectedDateTime),
+                              style: AppTextStyles.titleMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.edit_rounded,
+                        color: AppColors.primary,
+                        size: AppDimensions.iconMd,
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingXl),
+
+            // Typ des Anfalls
+            _buildModernSection(
+              title: 'Art des Anfalls',
+              icon: Icons.analytics_rounded,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                  boxShadow: [
+                    AppColors.elevation2,
+                  ],
+                ),
+                child: Column(
+                  children: SeizureType.values.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final type = entry.value;
+                    final isSelected = _selectedType == type;
+                    final isLast = index == SeizureType.values.length - 1;
+
+                    return Column(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _selectedType = type;
+                            });
+                          },
+                          borderRadius: BorderRadius.vertical(
+                            top: index == 0 ? Radius.circular(AppDimensions.radiusLg) : Radius.zero,
+                            bottom: isLast ? Radius.circular(AppDimensions.radiusLg) : Radius.zero,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(AppDimensions.spacingLg),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.primary.withValues(alpha: 0.1)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.vertical(
+                                top: index == 0 ? Radius.circular(AppDimensions.radiusLg) : Radius.zero,
+                                bottom: isLast ? Radius.circular(AppDimensions.radiusLg) : Radius.zero,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected ? AppColors.primary : AppColors.outline,
+                                      width: 2,
+                                    ),
+                                    color: isSelected ? AppColors.primary : Colors.transparent,
+                                  ),
+                                  child: isSelected
+                                      ? const Icon(
+                                          Icons.check_rounded,
+                                          size: 16,
+                                          color: Colors.white,
+                                        )
+                                      : null,
+                                ),
+                                const SizedBox(width: AppDimensions.spacingMd),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        type.displayName,
+                                        style: AppTextStyles.titleSmall.copyWith(
+                                          color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: AppDimensions.spacingXs),
+                                      Text(
+                                        type.description,
+                                        style: AppTextStyles.bodySmall.copyWith(
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (!isLast)
+                          Divider(
+                            height: 1,
+                            color: AppColors.outlineVariant,
+                            indent: AppDimensions.spacingLg,
+                            endIndent: AppDimensions.spacingLg,
+                          ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: AppDimensions.spacingXl),
 
             // Dauer
-            _buildSection(
+            _buildModernSection(
               title: 'Dauer des Anfalls',
               icon: Icons.timer,
               child: Card(
@@ -366,7 +493,7 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: _getSeverityColor(_severity).withOpacity(0.1),
+                          color: _getSeverityColor(_severity).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -524,7 +651,7 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
                       SwitchListTile(
                         title: const Text('Notfallmedikation genommen?'),
                         value: _medicationTaken,
-                        activeColor: AppColors.primary,
+                        activeThumbColor: AppColors.primary,
                         onChanged: (value) {
                           setState(() {
                             _medicationTaken = value;
@@ -648,6 +775,45 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
     );
   }
 
+  Widget _buildModernSection({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppDimensions.spacingSm),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.primary,
+                size: AppDimensions.iconSm,
+              ),
+            ),
+            const SizedBox(width: AppDimensions.spacingMd),
+            Expanded(
+              child: Text(
+                title,
+                style: AppTextStyles.titleMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppDimensions.spacingMd),
+        child,
+      ],
+    );
+  }
+
   Widget _buildMultiSelectChips({
     required List<String> items,
     required List<String> selectedItems,
@@ -667,7 +833,7 @@ class _SeizureLogScreenState extends State<SeizureLogScreen> {
             return FilterChip(
               label: Text(item),
               selected: isSelected,
-              selectedColor: AppColors.primary.withOpacity(0.2),
+              selectedColor: AppColors.primary.withValues(alpha: 0.2),
               checkmarkColor: AppColors.primary,
               onSelected: (selected) {
                 setState(() {

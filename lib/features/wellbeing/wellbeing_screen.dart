@@ -257,7 +257,7 @@ class _WellbeingScreenState extends State<WellbeingScreen> {
                 vertical: AppDimensions.spacingXs,
               ),
               decoration: BoxDecoration(
-                color: getStressColor().withOpacity(0.2),
+                color: getStressColor().withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
               ),
               child: Text(

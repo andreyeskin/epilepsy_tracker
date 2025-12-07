@@ -209,7 +209,7 @@ class _BeaconListItem extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: (room?.riskLevel.color ?? Colors.grey).withOpacity(0.1),
+          color: (room?.riskLevel.color ?? Colors.grey).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(

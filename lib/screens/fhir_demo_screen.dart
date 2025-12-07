@@ -41,19 +41,19 @@ ${id != null ? 'ID: $id' : ''}
 
     try {
       // 1. Device erstellen
-      print('\n=== Erstelle Device ===');
+      debugPrint('\n=== Erstelle Device ===');
       final deviceResult = await _fhirService.createDevice();
 
       // 2. Herzfrequenz-Observation erstellen
-      print('\n=== Erstelle Herzfrequenz-Observation ===');
+      debugPrint('\n=== Erstelle Herzfrequenz-Observation ===');
       final hrResult = await _fhirService.createObservationHeartRate(78, 'normal');
 
       // 3. Aktivitäts-Observation erstellen
-      print('\n=== Erstelle Aktivitäts-Observation ===');
+      debugPrint('\n=== Erstelle Aktivitäts-Observation ===');
       final activityResult = await _fhirService.createObservationActivity(8542);
 
       // 4. Optional: Anomalie-Flag
-      print('\n=== Erstelle Anomalie-Flag ===');
+      debugPrint('\n=== Erstelle Anomalie-Flag ===');
       final flagResult = await _fhirService.createFlagAnomaly(
         'Ungewöhnliche Herzfrequenz-Variation erkannt'
       );
@@ -94,7 +94,7 @@ Flag: ${flagResult['id']}'''
       final sessionEnd = now;
 
       // 1. VR-Procedure erstellen
-      print('\n=== Erstelle VR-Procedure ===');
+      debugPrint('\n=== Erstelle VR-Procedure ===');
       final procedureResult = await _fhirService.createProcedureVRSession(
         'Entspannungs-Szenario: Strand',
         sessionStart,
@@ -102,12 +102,12 @@ Flag: ${flagResult['id']}'''
       );
 
       // 2. Herzfrequenz-Zeitreihe erstellen
-      print('\n=== Erstelle Herzfrequenz-Zeitreihe ===');
+      debugPrint('\n=== Erstelle Herzfrequenz-Zeitreihe ===');
       final hrSeries = [85, 82, 78, 75, 72, 70, 68, 70, 72, 74];
       final hrSeriesResult = await _fhirService.createObservationHeartRateSeries(hrSeries);
 
       // 3. Stresslevel erstellen
-      print('\n=== Erstelle Stresslevel-Observation ===');
+      debugPrint('\n=== Erstelle Stresslevel-Observation ===');
       final stressResult = await _fhirService.createObservationStressLevel(7, 3);
 
       // Zusammenfassung anzeigen
@@ -145,18 +145,18 @@ Stressreduktion: 7 → 3'''
       final now = DateTime.now();
 
       // 1. MedicationStatement erstellen
-      print('\n=== Erstelle MedicationStatement ===');
+      debugPrint('\n=== Erstelle MedicationStatement ===');
       final medResult = await _fhirService.createMedicationStatement(
         'Lamotrigin 100mg',
         now
       );
 
       // 2. Adhärenz-Observation erstellen
-      print('\n=== Erstelle Adhärenz-Observation ===');
+      debugPrint('\n=== Erstelle Adhärenz-Observation ===');
       final adherenceResult = await _fhirService.createObservationAdherence(95.5);
 
       // 3. Task-Erinnerung erstellen
-      print('\n=== Erstelle Task-Erinnerung ===');
+      debugPrint('\n=== Erstelle Task-Erinnerung ===');
       final taskResult = await _fhirService.createTaskReminder(
         'Nächste Einnahme: Lamotrigin 100mg um 20:00 Uhr',
         'requested'

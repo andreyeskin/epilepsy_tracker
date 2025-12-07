@@ -8,7 +8,7 @@ class AppStrings {
 
   // Navigation
   static const String navHome = 'Start';
-  static const String navWellbeing = 'Wohlbefinden';
+  static const String navWellbeing = 'Ruheraum';
   static const String navMedications = 'Medikamente';
   static const String navInsights = 'Einblicke';
 

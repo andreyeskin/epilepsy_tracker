@@ -1,8 +1,7 @@
-/// Indoor Location-Based Service (LBS) Modul
-///
-/// Dieses Modul stellt alle Komponenten für Indoor-Positionierung
-/// und Safe-Zone-Überwachung mit BLE-Beacons bereit.
-library indoor_lbs;
+// Indoor Location-Based Service (LBS) Modul
+//
+// Dieses Modul stellt alle Komponenten für Indoor-Positionierung
+// und Safe-Zone-Überwachung mit BLE-Beacons bereit.
 
 // Data Layer
 export 'data/models/beacon_model.dart';

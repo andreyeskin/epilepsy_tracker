@@ -31,7 +31,7 @@ class RoomIndicatorWidget extends StatelessWidget {
               color: _getBackgroundColor(room, riskLevel),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: riskLevel.color.withOpacity(0.5),
+                color: riskLevel.color.withValues(alpha: 0.5),
                 width: 2,
               ),
             ),

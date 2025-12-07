@@ -25,21 +25,27 @@ class AchievementBadge extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppDimensions.spacingLg),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spacingLg,
+        vertical: AppDimensions.spacingMd,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            badgeColor.withOpacity(0.1),
-            badgeColor.withOpacity(0.05),
+            badgeColor.withOpacity(0.9),
+            badgeColor,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-        border: Border.all(
-          color: badgeColor.withOpacity(0.3),
-          width: 2,
-        ),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        boxShadow: [
+          BoxShadow(
+            color: badgeColor.withOpacity(0.4),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -48,12 +54,12 @@ class AchievementBadge extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: badgeColor.withOpacity(0.2),
+              color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
-              color: badgeColor,
+              color: Colors.white,
               size: 28,
             ),
           ),
@@ -67,8 +73,8 @@ class AchievementBadge extends StatelessWidget {
                 Text(
                   title,
                   style: AppTextStyles.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
                 if (subtitle != null) ...[
@@ -76,7 +82,7 @@ class AchievementBadge extends StatelessWidget {
                   Text(
                     subtitle!,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
+                      color: Colors.white.withOpacity(0.9),
                     ),
                   ),
                 ],
@@ -85,9 +91,10 @@ class AchievementBadge extends StatelessWidget {
           ),
 
           // Star icon
-          Text(
-            '⭐',
-            style: const TextStyle(fontSize: 24),
+          const Icon(
+            Icons.star_rounded,
+            color: Colors.white,
+            size: 32,
           ),
         ],
       ),

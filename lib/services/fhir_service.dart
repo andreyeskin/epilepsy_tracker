@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 /// Service-Klasse für FHIR-Operationen
@@ -412,12 +413,12 @@ class FhirService {
         body: jsonEncode(resource),
       );
 
-      print('POST /$resourceType - Status: ${response.statusCode}');
+      debugPrint('POST /$resourceType - Status: ${response.statusCode}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         final id = responseData['id'] ?? 'Keine ID zurückgegeben';
-        print('Erfolgreich erstellt - ID: $id');
+        debugPrint('Erfolgreich erstellt - ID: $id');
 
         return {
           'success': true,
@@ -426,7 +427,7 @@ class FhirService {
           'location': response.headers['location']
         };
       } else {
-        print('Fehler: ${response.body}');
+        debugPrint('Fehler: ${response.body}');
         return {
           'success': false,
           'statusCode': response.statusCode,
@@ -434,7 +435,7 @@ class FhirService {
         };
       }
     } catch (e) {
-      print('Exception: $e');
+      debugPrint('Exception: $e');
       return {
         'success': false,
         'error': e.toString()

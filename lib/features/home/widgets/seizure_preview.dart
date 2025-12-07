@@ -28,7 +28,11 @@ class SeizurePreview extends StatelessWidget {
           children: [
             Text(
               AppStrings.homeRecentSeizures,
-              style: AppTextStyles.h4,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
             ),
             TextButton(
               onPressed: onViewAll,
@@ -52,7 +56,7 @@ class SeizurePreview extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: 0.03),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
